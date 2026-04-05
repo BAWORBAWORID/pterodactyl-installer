@@ -73,7 +73,7 @@ _upgrade_print_header() {
   local top mid bot
   top=$(printf '╔%s╗' "$(printf '═%.0s' $(seq 1 $W))")
   mid=$(printf '║%s║' "$(printf ' ' $W)")
-  bot=$(printf '╚%s╝' "$(printf '═'.0s' $(seq 1 $W))")
+  bot=$(printf '╚%s╝' "$(printf '═%.0s' $(seq 1 $W))")
 
   echo -e "${CYAN}${top}${RST}"
   echo -e "${CYAN}${mid}${RST}"
