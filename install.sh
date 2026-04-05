@@ -52,7 +52,7 @@ execute() {
 
   if [[ "$1" == "upgrade" ]]; then
     bash <(curl -sSL "$GITHUB_BASE_URL"/master/installers/upgrade.sh) |& tee -a $LOG_PATH
-    return
+    return 0
   fi
 
   [[ "$1" == *"canary"* ]] && export GITHUB_SOURCE="master" && export SCRIPT_RELEASE="canary"
@@ -114,7 +114,16 @@ while [ "$done" == false ]; do
 
   valid_input=("$(for ((i = 0; i <= ${#actions[@]} - 1; i += 1)); do echo "${i}"; done)")
   [[ ! " ${valid_input[*]} " =~ ${action} ]] && error "Invalid option"
-  [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
+  [[ " ${valid_input[*]} " =~ ${action} ]] && IFS=";" read -r i1 i2 <<<"${actions[$action]}"
+
+  # Upgrade: don't exit menu after completion
+  if [[ "$i1" == "upgrade" ]]; then
+    execute "upgrade"
+    output ""
+    continue
+  fi
+
+  done=true && execute "$i1" "$i2"
 done
 
 # Remove lib.sh, so next time the script is run the, newest version is downloaded.
