@@ -140,6 +140,23 @@ while [ "$done" == false ]; do
   [[ ! " ${valid_input[*]} " =~ ${action} ]] && error "Invalid option"
   [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}"
 
+  # Check if panel already installed for option 0
+  if [[ "$i1" == "panel" && -d "/var/www/pterodactyl" ]]; then
+    output ""
+    output "Panel sudah terinstall di sistem ini!"
+    output ""
+    echo -e -n "* Apakah kamu ingin upgrade panel sekarang? (y/N): "
+    read -r UPGRADE_CHOICE
+    if [[ "$UPGRADE_CHOICE" =~ [Yy] ]]; then
+      execute "upgrade"
+      continue
+    else
+      output "Upgrade dibatalkan. Kembali ke menu utama..."
+      done=false
+      continue
+    fi
+  fi
+
   # Use execute_with_upgrade_prompt for panel installation (option 0 and 2)
   if [[ "$i1" == "panel" && -z "$i2" ]] || [[ "$i1" == "panel" && "$i2" == "wings" ]]; then
     execute_with_upgrade_prompt "$i1" "$i2"
