@@ -34,7 +34,7 @@ git push
 
 output "Release $RELEASE pushed"
 
-output "Create a new release, with changelog below - https://github.com/BAWORBAWORID/pterodactyl-installer2/releases/new"
+output "Create a new release, with changelog below - https://github.com/BAWORBAWORID/pterodactyl-installer/releases/new"
 output ""
 
 changelog=$(scripts/changelog_parse.py)

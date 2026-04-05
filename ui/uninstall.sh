@@ -21,7 +21,7 @@ set -e
 #   You should have received a copy of the GNU General Public License                #
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>.           #
 #                                                                                    #
-# https://github.com/BAWORBAWORID/pterodactyl-installer2/blob/master/LICENSE          #
+# https://github.com/BAWORBAWORID/pterodactyl-installer/blob/master/LICENSE          #
 #                                                                                    #
 # This script is not associated with the official Pterodactyl Project.               #
 # https://github.com/BAWORBAWORID/pterodactyl-installer                              #
