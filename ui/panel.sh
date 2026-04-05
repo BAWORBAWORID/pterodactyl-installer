@@ -66,6 +66,81 @@ export CONFIGURE_FIREWALL=false
 
 # ------------ User input functions ------------ #
 
+run_upgrade() {
+  output "Starting upgrade to BAWORBAWORID panel..."
+  run_installer "panel_upgrade"
+}
+
+upgrade_summary() {
+  print_brake 62
+  output "Upgrade Summary"
+  print_brake 62
+  output "Your existing panel will be upgraded to the latest BAWORBAWORID panel."
+  output "Your .env file and database will NOT be modified."
+  output "Source: https://github.com/BAWORBAWORID/panel"
+  print_brake 62
+}
+
+goodbye_upgrade() {
+  print_brake 62
+  output "Panel upgrade completed successfully!"
+  output ""
+  output "Your panel should be back online and fully operational."
+  output ""
+  output "Powered By Always Codex - https://alwayscodex.my.id"
+  print_brake 62
+}
+
+handle_existing_installation() {
+  echo ""
+  print_brake 70
+  output "${COLOR_YELLOW}Existing Pterodactyl installation detected!${COLOR_NC}"
+  print_brake 70
+  echo ""
+  output "An existing panel was found at /var/www/pterodactyl."
+  output "What would you like to do?"
+  echo ""
+  output "[1] Upgrade existing panel to BAWORBAWORID Panel"
+  output "[2] Proceed with fresh installation anyway (NOT recommended, may break things)"
+  output "[3] Abort"
+  echo ""
+  echo -n "* Input [1-3]: "
+  read -r EXISTING_CHOICE
+
+  case "$EXISTING_CHOICE" in
+    1)
+      upgrade_summary
+      echo -e -n "\n* Confirm upgrade to BAWORBAWORID Panel? (y/N): "
+      read -r CONFIRM_UPGRADE
+      if [[ "$CONFIRM_UPGRADE" =~ [Yy] ]]; then
+        run_upgrade
+        goodbye_upgrade
+        exit 0
+      else
+        error "Upgrade aborted."
+        exit 1
+      fi
+      ;;
+    2)
+      warning "Proceeding with fresh installation on top of existing panel. This may cause issues!"
+      echo -e -n "* Are you absolutely sure? (y/N): "
+      read -r CONFIRM_FORCE
+      if [[ ! "$CONFIRM_FORCE" =~ [Yy] ]]; then
+        error "Installation aborted."
+        exit 1
+      fi
+      ;;
+    3|"")
+      error "Installation aborted."
+      exit 1
+      ;;
+    *)
+      error "Invalid option. Installation aborted."
+      exit 1
+      ;;
+  esac
+}
+
 ask_letsencrypt() {
   if [ "$CONFIGURE_UFW" == false ] && [ "$CONFIGURE_FIREWALL_CMD" == false ]; then
     warning "Let's Encrypt requires port 80/443 to be opened! You have opted out of the automatic firewall configuration; use this at your own risk (if port 80/443 is closed, the script will fail)!"
@@ -103,13 +178,7 @@ check_FQDN_SSL() {
 main() {
   # check if we can detect an already existing installation
   if [ -d "/var/www/pterodactyl" ]; then
-    warning "The script has detected that you already have Pterodactyl panel on your system! You cannot run the script multiple times, it will fail!"
-    echo -e -n "* Are you sure you want to proceed? (y/N): "
-    read -r CONFIRM_PROCEED
-    if [[ ! "$CONFIRM_PROCEED" =~ [Yy] ]]; then
-      error "Installation aborted!"
-      exit 1
-    fi
+    handle_existing_installation
   fi
 
   welcome "panel"

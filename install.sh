@@ -50,11 +50,6 @@ source /tmp/lib.sh
 execute() {
   echo -e "\n\n* pterodactyl-installer $(date) \n\n" >>$LOG_PATH
 
-  if [[ "$1" == "upgrade" ]]; then
-    bash <(curl -sSL "$GITHUB_BASE_URL"/master/installers/upgrade.sh) |& tee -a $LOG_PATH
-    return 0
-  fi
-
   [[ "$1" == *"canary"* ]] && export GITHUB_SOURCE="master" && export SCRIPT_RELEASE="canary"
   update_lib_source
   run_ui "${1//_canary/}" |& tee -a $LOG_PATH
@@ -79,12 +74,11 @@ while [ "$done" == false ]; do
     "Install the panel"
     "Install Wings"
     "Install both [0] and [1] on the same machine (wings script runs after panel)"
-    "Upgrade Panel (to BAWORBAWORID/panel)"
     # "Uninstall panel or wings\n"
 
     "Install panel with canary version of the script (the versions that lives in master, may be broken!)"
     "Install Wings with canary version of the script (the versions that lives in master, may be broken!)"
-    "Install both [5] and [6] on the same machine (wings script runs after panel)"
+    "Install both [3] and [4] on the same machine (wings script runs after panel)"
     "Uninstall panel or wings with canary version of the script (the versions that lives in master, may be broken!)"
   )
 
@@ -92,7 +86,6 @@ while [ "$done" == false ]; do
     "panel"
     "wings"
     "panel;wings"
-    "upgrade"
     # "uninstall"
 
     "panel_canary"
@@ -114,32 +107,7 @@ while [ "$done" == false ]; do
 
   valid_input=("$(for ((i = 0; i <= ${#actions[@]} - 1; i += 1)); do echo "${i}"; done)")
   [[ ! " ${valid_input[*]} " =~ ${action} ]] && error "Invalid option"
-  [[ " ${valid_input[*]} " =~ ${action} ]] && IFS=";" read -r i1 i2 <<<"${actions[$action]}"
-
-  # Check if panel already installed for option 0
-  if [[ "$i1" == "panel" && -d "/var/www/pterodactyl" ]]; then
-    output ""
-    output "Panel sudah terinstall di sistem ini!"
-    output ""
-    echo -e -n "* Apakah kamu ingin upgrade panel sekarang? (y/N): "
-    read -r UPGRADE_CHOICE
-    if [[ "$UPGRADE_CHOICE" =~ [Yy] ]]; then
-      execute "upgrade"
-    else
-      output "Upgrade dibatalkan."
-    fi
-    output ""
-    continue
-  fi
-
-  # Upgrade: don't exit menu after completion
-  if [[ "$i1" == "upgrade" ]]; then
-    execute "upgrade"
-    output ""
-    continue
-  fi
-
-  done=true && execute "$i1" "$i2"
+  [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
 done
 
 # Remove lib.sh, so next time the script is run the, newest version is downloaded.
