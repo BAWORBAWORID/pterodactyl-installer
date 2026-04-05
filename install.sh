@@ -71,30 +71,6 @@ execute() {
   fi
 }
 
-execute_with_upgrade_prompt() {
-  echo -e "\n\n* pterodactyl-installer $(date) \n\n" >>$LOG_PATH
-
-  [[ "$1" == *"canary"* ]] && export GITHUB_SOURCE="master" && export SCRIPT_RELEASE="canary"
-  update_lib_source
-  run_ui "${1//_canary/}" |& tee -a $LOG_PATH
-
-  if [[ -n $2 ]]; then
-    echo -e -n "* Installation of $1 completed. Do you want to proceed to $2 installation? (y/N): "
-    read -r CONFIRM
-    if [[ "$CONFIRM" =~ [Yy] ]]; then
-      execute_with_upgrade_prompt "$2"
-    fi
-  fi
-
-  echo ""
-  output "Installation completed!"
-  echo -e -n "* Do you want to upgrade the panel now? (y/N): "
-  read -r UPGRADE_CONFIRM
-  if [[ "$UPGRADE_CONFIRM" =~ [Yy] ]]; then
-    execute "upgrade"
-  fi
-}
-
 welcome ""
 
 done=false
@@ -138,31 +114,7 @@ while [ "$done" == false ]; do
 
   valid_input=("$(for ((i = 0; i <= ${#actions[@]} - 1; i += 1)); do echo "${i}"; done)")
   [[ ! " ${valid_input[*]} " =~ ${action} ]] && error "Invalid option"
-  [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}"
-
-  # Check if panel already installed for option 0
-  if [[ "$i1" == "panel" && -d "/var/www/pterodactyl" ]]; then
-    output ""
-    output "Panel sudah terinstall di sistem ini!"
-    output ""
-    echo -e -n "* Apakah kamu ingin upgrade panel sekarang? (y/N): "
-    read -r UPGRADE_CHOICE
-    if [[ "$UPGRADE_CHOICE" =~ [Yy] ]]; then
-      execute "upgrade"
-      continue
-    else
-      output "Upgrade dibatalkan. Kembali ke menu utama..."
-      done=false
-      continue
-    fi
-  fi
-
-  # Use execute_with_upgrade_prompt for panel installation (option 0 and 2)
-  if [[ "$i1" == "panel" && -z "$i2" ]] || [[ "$i1" == "panel" && "$i2" == "wings" ]]; then
-    execute_with_upgrade_prompt "$i1" "$i2"
-  else
-    execute "$i1" "$i2"
-  fi
+  [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
 done
 
 # Remove lib.sh, so next time the script is run the, newest version is downloaded.
