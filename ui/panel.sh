@@ -144,11 +144,11 @@ main() {
   output "List of valid timezones here $(hyperlink "https://www.php.net/manual/en/timezones.php")"
 
   while [ -z "$timezone" ]; do
-    echo -n "* Select timezone [Europe/Stockholm]: "
+    echo -n "* Select timezone [Asia/Jakarta]: "
     read -r timezone_input
 
     array_contains_element "$timezone_input" "${valid_timezones[@]}" && timezone="$timezone_input"
-    [ -z "$timezone_input" ] && timezone="Europe/Stockholm" # because köttbullar!
+    [ -z "$timezone_input" ] && timezone="Asia/Jakarta"
   done
 
   email_input email "Provide the email address that will be used to configure Let's Encrypt and Pterodactyl: " "Email cannot be empty or invalid"

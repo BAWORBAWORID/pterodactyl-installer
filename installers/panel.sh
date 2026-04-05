@@ -47,7 +47,7 @@ MYSQL_USER="${MYSQL_USER:-pterodactyl}"
 MYSQL_PASSWORD="${MYSQL_PASSWORD:-$(gen_passwd 64)}"
 
 # Environment
-timezone="${timezone:-Europe/Stockholm}"
+timezone="${timezone:-Asia/Jakarta}"
 
 # Assume SSL, will fetch different config if true
 ASSUME_SSL="${ASSUME_SSL:-false}"
